@@ -8,6 +8,11 @@ import gr.aueb.cf.springteacher4.service.ITeacherService;
 import gr.aueb.cf.springteacher4.service.exceptions.EntityNotFoundException;
 import gr.aueb.cf.springteacher4.validator.TeacherInsertValidator;
 import gr.aueb.cf.springteacher4.validator.TeacherUpdateValidator;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +43,13 @@ public class TeacherRestController {
         this.teacherUpdateValidator = teacherUpdateValidator;
     }
 
+    @Operation(summary = "Get teachers by their lastname starting with initials")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Teachers Found",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TeacherReadOnlyDTO.class)) }),
+            @ApiResponse(responseCode = "400", description = "Invalid lastname supplied",
+                    content = @Content)})
     @GetMapping("/teachers")
     public ResponseEntity<List<TeacherReadOnlyDTO>> getTeachersByLastname(@RequestParam("lastname") String lastname) {
         List<Teacher> teachers;
@@ -53,6 +65,13 @@ public class TeacherRestController {
         }
     }
 
+    @Operation(summary = "Get a Teacher by id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Teacher Found",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TeacherReadOnlyDTO.class)) }),
+            @ApiResponse(responseCode = "404", description = "Teacher not found",
+                    content = @Content)})
     @GetMapping("/teachers/{teacherId}")
     public ResponseEntity<TeacherReadOnlyDTO> getTeacher(@PathVariable("teacherId") Long teacherId) {
         Teacher teacher;
@@ -65,6 +84,15 @@ public class TeacherRestController {
         }
     }
 
+    @Operation(summary = "Add a teacher")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Teacher created",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TeacherReadOnlyDTO.class)) }),
+            @ApiResponse(responseCode = "400", description = "Invalid input was supplied",
+                    content = @Content),
+            @ApiResponse(responseCode = "503", description = "Service Unavailable",
+                    content = @Content)})
     @PostMapping("/teachers")
     public ResponseEntity<TeacherReadOnlyDTO> addTeacher(@RequestBody TeacherInsertDTO insertDTO, BindingResult bindingResult) {
         teacherInsertValidator.validate(insertDTO, bindingResult);
@@ -84,6 +112,13 @@ public class TeacherRestController {
         }
     }
 
+    @Operation(summary = "Delete a Teacher by id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Teacher Deleted",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TeacherReadOnlyDTO.class)) }),
+            @ApiResponse(responseCode = "404", description = "Teacher not found",
+                    content = @Content)})
     @RequestMapping(path = "/teachers/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<TeacherReadOnlyDTO> deleteTeacher(@PathVariable("id") Long id) {
         try {
@@ -96,6 +131,17 @@ public class TeacherRestController {
         }
     }
 
+    @Operation(summary = "Update a teacher")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Teacher updated",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TeacherReadOnlyDTO.class)) }),
+            @ApiResponse(responseCode = "401", description = "Unauthorized user",
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid input was supplied",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Teacher not found",
+                    content = @Content) })
     @RequestMapping(path = "/teachers/{id}", method = RequestMethod.PUT)
     public ResponseEntity<TeacherReadOnlyDTO> updateTeacher(@PathVariable("id") Long id,
                                                             @Valid @RequestBody TeacherUpdateDTO updateDTO,
