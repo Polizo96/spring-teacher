@@ -75,7 +75,7 @@ public class TeacherRestController {
             Teacher teacher = teacherService.insertTeacher(insertDTO);
             TeacherReadOnlyDTO dto = convertToReadOnlyDto(teacher);
             URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                    .path("{id}")
+                    .path("/{id}")
                     .buildAndExpand(dto.getId())
                     .toUri();
             return ResponseEntity.created(location).body(dto);
